@@ -80,9 +80,20 @@
 
   /* ───────── Saved progress ───────── */
   const STORE = 'kittenMathVillage.v1';
-  let save = { name: '', sound: true, levels: {} };
+  let save = { name: '', sound: true, levels: {}, rounds: {} };
   try { save = Object.assign(save, JSON.parse(localStorage.getItem(STORE) || '{}')); } catch (e) { /* private mode */ }
   const persist = () => { try { localStorage.setItem(STORE, JSON.stringify(save)); } catch (e) { /* ignore */ } };
+  /** Remember an unfinished round so it can be picked up later, even after closing the app. */
+  function saveRound(nextIndex) {
+    if (!quiz) return;
+    save.rounds = save.rounds || {};
+    save.rounds[quiz.level.id] = { questions: quiz.questions, i: nextIndex, firstTry: quiz.firstTry, total: quiz.total };
+    persist();
+  }
+  const savedRound = (id) => {
+    const r = save.rounds && save.rounds[id];
+    return r && Array.isArray(r.questions) && r.questions.length && r.i > 0 ? r : null;
+  };
   const playerName = () => (save.name || '').trim() || 'Champ';
 
   /* ───────── Sound (tiny WebAudio blips, no files) ───────── */
@@ -218,6 +229,7 @@
         <span class="stop-info">
           <span class="stop-place">${l.place}</span>
           <span class="stop-topic">${l.topic}</span>
+          ${savedRound(l.id) ? `<span class="chip resume">▶ Continue · question ${Math.min(savedRound(l.id).i + 1, savedRound(l.id).questions.length)} of ${savedRound(l.id).questions.length}</span>` : ''}
           <span class="stars">${starsHtml(done ? done.stars : 0)}</span>
         </span>
         <img class="stop-trophy${done ? '' : ' locked'}" src="${sprite(who, 'trophy_front')}" alt="${done ? 'Trophy earned' : 'Trophy not earned yet'}">
@@ -228,7 +240,11 @@
     const b = e.target.closest('.stop');
     if (!b) return;
     sfx.tap();
-    startLesson(b.dataset.level);
+    const id = b.dataset.level;
+    const r = savedRound(id);
+    if (r && confirm(`Pick up where you left off (question ${Math.min(r.i + 1, r.questions.length)} of ${r.questions.length})?\n\nOK = keep going   ·   Cancel = start a new round`)) return startQuiz(id, true);
+    if (r) { delete save.rounds[id]; persist(); }
+    startLesson(id);
   });
 
   /* ───────── Lesson intro ───────── */
@@ -272,15 +288,17 @@
     .map((k) => `<button class="key${k === 'ok' ? ' key-ok' : k === 'del' ? ' key-del' : ''}" data-key="${k}">${k === 'ok' ? 'Check' : k === 'del' ? '⌫' : k}</button>`)
     .join('');
 
-  function startQuiz(id) {
+  function startQuiz(id, resume) {
     const level = levelById(id);
-    quiz = {
-      level, questions: Questions.build(id, playerName()),
-      i: 0, firstTry: 0, total: 0, retried: false, locked: false,
-    };
-    quiz.total = quiz.questions.length;
+    const saved = resume ? savedRound(id) : null;
+    quiz = saved
+      ? { level, questions: saved.questions, i: saved.i, firstTry: saved.firstTry, total: saved.total, locked: false }
+      : { level, questions: Questions.build(id, playerName()), i: 0, firstTry: 0, total: 0, locked: false };
+    if (!saved) quiz.total = quiz.questions.length;
+    preload(level.host); preload('hero'); preload('coach');
     show('quiz');
     closeCoach();
+    if (quiz.i >= quiz.questions.length) return finishQuiz();   // closed right after the last answer
     renderQuestion();
   }
 
@@ -292,6 +310,7 @@
   function renderQuestion() {
     const q = quiz.questions[quiz.i];
     Object.assign(quiz, { tries: 0, hintTier: 0, locked: false, value: '', field: 0 });
+    saveRound(quiz.i);
     renderProgress();
     closeCoach();
     $('#feedback').classList.remove('show');
@@ -439,6 +458,7 @@
     quiz.locked = true;
     q.result = quiz.tries === 0 ? 'first' : 'done';
     if (quiz.tries === 0 && !q.isRetry) quiz.firstTry++;
+    saveRound(quiz.i + 1);
     closeCoach();
     $('#toast').classList.remove('show');
     $('#hint-btn').classList.remove('nudge');
@@ -468,6 +488,7 @@
         again.isRetry = true;
         quiz.questions.push(again);
       }
+      saveRound(quiz.i + 1);
       feedback('learn', `Let's look at this one together.`,
         `${q.explain}<br><span class="fb-note">That was a tricky one! You'll get another one like it at the end.</span>`);
       return;
@@ -495,7 +516,6 @@
 
   $('#quiz-back').addEventListener('click', () => {
     sfx.tap();
-    if (quiz && quiz.i > 0 && !confirm('Leave this round? Your progress in this round will be lost.')) return;
     quiz = null;
     show('map');
   });
@@ -557,6 +577,7 @@
 
   function finishQuiz() {
     const { level, firstTry, total } = quiz;
+    if (save.rounds) delete save.rounds[level.id];
     const stars = firstTry >= total - 1 ? 3 : firstTry >= Math.ceil(total * 0.6) ? 2 : 1;
     const prev = save.levels[level.id];
     const isNew = !prev;
@@ -617,6 +638,7 @@
   $('#reset-btn').addEventListener('click', () => {
     if (!confirm('Start over? This clears all trophies and stars.')) return;
     save.levels = {};
+    save.rounds = {};
     persist();
     renderShelf();
   });

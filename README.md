@@ -27,7 +27,9 @@ It is a plain static site (no build step), so it runs on GitHub Pages as-is.
 - **Mistakes are safe.** After three misses the host walks through the solution, and a
   new problem of the same kind is added to the end of the round.
 - **Trophies and stars.** Finishing a stop earns its collectible statuette; stars
-  (1–3) reflect how many were solved on the first try. Progress is saved on the device.
+  (1–3) reflect how many were solved on the first try.
+- **Stop and come back.** Trophies, stars, and any half-finished round are saved on the
+  device, so she can close the game and continue from the same question later.
 
 ## Put it on GitHub Pages
 
