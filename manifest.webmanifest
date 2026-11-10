@@ -1,0 +1,15 @@
+{
+  "name": "Kitten Math Village",
+  "short_name": "Kitten Math",
+  "description": "Cozy multiplication practice for Unit 6: Multiplication Strategies with Multi-Digit Numbers.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#8fd49a",
+  "theme_color": "#9fd6f5",
+  "icons": [
+    { "src": "assets/icons/icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Kitten Math Village</title>
+  <meta name="description" content="A cozy math-practice game for Unit 6: Multiplication Strategies with Multi-Digit Numbers.">
+  <meta name="theme-color" content="#9fd6f5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Kitten Math">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
+  <link rel="icon" type="image/png" href="assets/icons/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ───────── Title ───────── -->
+  <section id="title" class="screen active">
+    <div class="sky-deco" aria-hidden="true"><i class="cloud cl1"></i><i class="cloud cl2"></i><i class="cloud cl3"></i></div>
+    <div class="title-wrap">
+      <img class="title-hero sprite-bob" src="assets/sprites/hero/showcase.webp" alt="">
+      <div class="title-card">
+        <div class="logo"><span class="logo-top">Kitten Math</span><span class="logo-main">Village</span></div>
+        <p class="tagline">Multiplication Strategies · Unit 6 Practice</p>
+        <label class="name-row">
+          <span>Player name</span>
+          <input id="name-input" type="text" maxlength="14" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Your name">
+        </label>
+        <button id="play-btn" class="btn btn-big">Play!</button>
+      </div>
+      <div class="title-cast" aria-hidden="true">
+        <img src="assets/sprites/axolotl/talk.webp" alt=""><img src="assets/sprites/kitten/cheer.webp" alt="">
+        <img src="assets/sprites/llama/talk.webp" alt=""><img src="assets/sprites/coach/victory.webp" alt="">
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Village map ───────── -->
+  <section id="map" class="screen">
+    <header class="topbar">
+      <button class="iconbtn" data-go="title" aria-label="Back to title">←</button>
+      <h1 class="bar-title">Snowflake Village</h1>
+      <button class="iconbtn sound-btn" aria-label="Sound">🔊</button>
+      <button id="shelf-btn" class="btn btn-small">🏆 Trophies <span id="trophy-count"></span></button>
+    </header>
+    <div class="map-scroll">
+      <p id="map-greeting" class="signpost"></p>
+      <div id="stops" class="stops"></div>
+    </div>
+  </section>
+
+  <!-- ───────── Lesson intro ───────── -->
+  <section id="lesson" class="screen">
+    <header class="topbar">
+      <button class="iconbtn" data-go="map" aria-label="Back to village">←</button>
+      <h1 class="bar-title" id="lesson-title"></h1>
+      <button id="lesson-skip" class="btn btn-small">Skip ▶▶</button>
+    </header>
+    <div class="lesson-stage">
+      <img id="lesson-img" class="lesson-host sprite-bob" src="assets/sprites/axolotl/talk.webp" alt="">
+      <div class="bubble big" id="lesson-bubble">
+        <span class="nametag" id="lesson-name"></span>
+        <div id="lesson-text" class="bubble-text"></div>
+        <button id="lesson-next" class="btn">Next ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Quiz ───────── -->
+  <section id="quiz" class="screen">
+    <header class="topbar">
+      <button class="iconbtn" id="quiz-back" aria-label="Back to village">←</button>
+      <div id="progress" class="progress"></div>
+      <button id="hint-btn" class="hint-btn">
+        <img src="assets/sprites/coach/face_helpful.webp" alt="">
+        <span>Ask Coach</span>
+      </button>
+      <button class="iconbtn sound-btn" aria-label="Sound">🔊</button>
+    </header>
+    <div class="quiz-body">
+      <div class="q-left">
+        <div class="hostrow">
+          <div class="host-box"><img id="host-img" class="sprite-bob" src="assets/sprites/axolotl/idle.webp" alt=""></div>
+          <div class="bubble" id="q-bubble">
+            <span class="nametag" id="host-name"></span>
+            <div id="q-text" class="bubble-text"></div>
+            <div id="toast" class="toast" role="status"></div>
+          </div>
+        </div>
+        <div id="answer-area" class="answer-area"></div>
+        <div class="q-bottom">
+          <div class="hero-box"><img id="hero-img" src="assets/sprites/hero/think.webp" alt=""><i class="shadow"></i></div>
+          <div id="keypad" class="keypad"></div>
+        </div>
+        <div id="feedback" class="feedback">
+          <div class="fb-head" id="fb-head"></div>
+          <div class="fb-text" id="fb-text"></div>
+          <button id="fb-next" class="btn">Next ▶</button>
+        </div>
+      </div>
+      <div class="q-right" id="pad-wrap">
+        <div class="pad-tools">
+          <span class="pad-label">✏️ Sketchpad</span>
+          <button class="swatch active" data-color="#4a3b2c" style="--c:#4a3b2c" aria-label="Pencil"></button>
+          <button class="swatch" data-color="#3b6fd6" style="--c:#3b6fd6" aria-label="Blue pen"></button>
+          <button class="swatch" data-color="#e2557b" style="--c:#e2557b" aria-label="Pink pen"></button>
+          <button class="tool" id="pad-eraser" aria-label="Eraser">Eraser</button>
+          <span class="spacer"></span>
+          <button class="tool" id="pad-grid" aria-label="Grid paper">Grid</button>
+          <button class="tool" id="pad-undo" aria-label="Undo">↶ Undo</button>
+          <button class="tool" id="pad-clear" aria-label="Clear">Clear</button>
+          <button class="tool" id="pad-expand" aria-label="Bigger sketchpad">⤢</button>
+        </div>
+        <div class="pad-paper grid" id="pad-paper">
+          <canvas id="pad"></canvas>
+          <div class="pad-empty" id="pad-empty">Write your math here with your Apple Pencil ✏️</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coach hint panel -->
+    <div id="coach" class="coach">
+      <img id="coach-img" src="assets/sprites/coach/explain.webp" alt="">
+      <div class="bubble coach-bubble">
+        <span class="nametag coach-tag">Coach</span>
+        <div id="coach-text" class="bubble-text"></div>
+        <div class="coach-btns">
+          <button id="coach-more" class="btn btn-ghost">Another hint</button>
+          <button id="coach-ok" class="btn">Thanks, Coach!</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Result ───────── -->
+  <section id="result" class="screen">
+    <div class="result-wrap">
+      <h1 id="result-title" class="result-title"></h1>
+      <div class="result-row">
+        <div class="hero-box big"><img id="result-hero" src="assets/sprites/hero/victory.webp" alt=""><i class="shadow"></i></div>
+        <div class="trophy-stand">
+          <div class="glow"></div>
+          <img id="result-trophy" src="assets/sprites/hero/trophy_front.webp" alt="Trophy">
+          <div id="result-trophy-name" class="plaque"></div>
+        </div>
+        <div class="result-host"><img id="result-host" class="sprite-bob" src="assets/sprites/coach/victory.webp" alt=""></div>
+      </div>
+      <div id="result-stars" class="stars big"></div>
+      <p id="result-text" class="result-text"></p>
+      <div class="result-btns">
+        <button id="result-again" class="btn btn-ghost">Play again</button>
+        <button id="result-map" class="btn btn-big">Back to village</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Trophy shelf ───────── -->
+  <section id="shelf" class="screen">
+    <header class="topbar">
+      <button class="iconbtn" data-go="map" aria-label="Back to village">←</button>
+      <h1 class="bar-title">Trophy Shelf</h1>
+      <button id="reset-btn" class="btn btn-small btn-ghost">Start over</button>
+    </header>
+    <div class="shelf-scroll">
+      <p class="signpost">Tap a trophy to spin it around!</p>
+      <div id="shelf-grid" class="shelf-grid"></div>
+    </div>
+  </section>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+</div>
+
+<script src="js/questions.js"></script>
+<script src="js/sketchpad.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
