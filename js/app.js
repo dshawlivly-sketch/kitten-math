@@ -11,9 +11,9 @@
 
   /* ───────── Cast ───────── */
   const CAST = {
-    hero: { name: 'Champ', color: '#5b8fe0' },
-    axolotl: { name: 'Professor Axel', color: '#e86b90' },
-    llama: { name: 'Ms. Lulu', color: '#2f8a68' },
+    hero: { name: 'Champ', color: '#3a6fcb' },
+    axolotl: { name: 'Professor Axel', color: '#c23e68' },
+    llama: { name: 'Ms. Lulu', color: '#26795a' },
     kitten: { name: 'Professor Mittens', color: '#7a5cc0' },
     coach: { name: 'Coach', color: '#3b6fd6' },
   };
